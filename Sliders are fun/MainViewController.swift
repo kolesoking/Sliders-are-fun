@@ -8,52 +8,33 @@
 import UIKit
 
 protocol SettingsViewControllerDelegate {
-    func setNewColorValue(red: CGFloat, green: CGFloat, blue: CGFloat)
+    func setNewColorValue(_ color: UIColor)
 }
 
 class MainViewController: UIViewController {
 
     @IBOutlet weak var mainView: UIView!
     
-    private var redBackgroundColor: CGFloat = 0.7
-    private var greenBackGroundColor: CGFloat = 0.5
-    private var blueBackGroundColor: CGFloat = 0.3
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setBackgroundColor(
-            red: redBackgroundColor,
-            green: greenBackGroundColor,
-            blue: blueBackGroundColor
-        )
     }
     
-    private func setBackgroundColor(red: CGFloat, green: CGFloat, blue: CGFloat) {
-        mainView.backgroundColor = UIColor(
-            red: red,
-            green: green,
-            blue: blue,
-            alpha: 1
-        )
+    private func setBackgroundColor(_ color: UIColor) {
+        mainView.backgroundColor = color
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard let settingsVC = segue.destination as? SettingsViewController else { return }
-        settingsVC.redBackgroundColor = redBackgroundColor
-        settingsVC.greenBackGroundColor = greenBackGroundColor
-        settingsVC.blueBackGroundColor = blueBackGroundColor
+        settingsVC.currentColor = CIColor(color: mainView.backgroundColor ?? .red)
         settingsVC.delegate = self
         print(111)
     }
 }
 
 extension MainViewController: SettingsViewControllerDelegate {
-    func setNewColorValue(red: CGFloat, green: CGFloat, blue: CGFloat) {
-        redBackgroundColor = red
-        greenBackGroundColor = green
-        blueBackGroundColor = blue
-        
-        setBackgroundColor(red: red, green: green, blue: blue)
+    func setNewColorValue(_ color: UIColor) {
+        mainView.backgroundColor = color
+        setBackgroundColor(color)
     }
 }

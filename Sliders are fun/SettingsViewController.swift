@@ -12,13 +12,6 @@ class SettingsViewController: UIViewController {
     //MARK: - Views
     @IBOutlet weak var viewColorRGB: UIView!
     
-    //MARK: - Background Colors
-    var redBackgroundColor: CGFloat!
-    var greenBackGroundColor: CGFloat!
-    var blueBackGroundColor: CGFloat!
-    
-    //MARK: - Delegate
-    var delegate: SettingsViewControllerDelegate!
     
     //MARK: - Sliders
     @IBOutlet weak var sliderRed: UISlider!
@@ -36,6 +29,11 @@ class SettingsViewController: UIViewController {
     @IBOutlet weak var greenTextField: UITextField!
     @IBOutlet weak var blueTextField: UITextField!
 
+    //MARK: - Background Color
+    var currentColor: CIColor!
+    
+    //MARK: - Delegate
+    var delegate: SettingsViewControllerDelegate!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,13 +46,13 @@ class SettingsViewController: UIViewController {
         viewColorRGB.layer.cornerRadius = 15
         
         //MARK: - Sliders Value
-        sliderRed.value = Float(redBackgroundColor)
+        sliderRed.value = Float(currentColor.red)
         sliderRed.minimumTrackTintColor = .red
         
-        sliderGreen.value = Float(greenBackGroundColor)
+        sliderGreen.value = Float(currentColor.green)
         sliderGreen.minimumTrackTintColor = .green
         
-        sliderBlue.value = Float(blueBackGroundColor)
+        sliderBlue.value = Float(currentColor.blue)
         
         //MARK: - Text Fields Value
         redTextField.text = sliderStringValue(with: sliderRed)
@@ -67,13 +65,10 @@ class SettingsViewController: UIViewController {
         blueColorValue.text = sliderStringValue(with: sliderBlue)
         
         //MARK: - Color View
-        viewColorRGB.backgroundColor = UIColor(
-            red: CGFloat(sliderRed.value),
-            green: CGFloat(sliderGreen.value),
-            blue: CGFloat(sliderBlue.value),
-            alpha: 1
-        )
+        setBackgroundColor()
     }
+    
+    
     
     //MARK: - Passing value in label and text field
     
@@ -98,11 +93,7 @@ class SettingsViewController: UIViewController {
     }
     
     @IBAction func doneButtonPressed(_ sender: Any) {
-        delegate.setNewColorValue(
-            red: CGFloat(sliderRed.value),
-            green: CGFloat(sliderGreen.value),
-            blue: CGFloat(sliderBlue.value)
-        )
+        delegate.setNewColorValue(viewColorRGB.backgroundColor ?? .red)
         dismiss(animated: true)
     }
     
@@ -126,6 +117,20 @@ class SettingsViewController: UIViewController {
 extension SettingsViewController: UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        
+        switch textField {
+        case redTextField:
+            greenTextField.becomeFirstResponder()
+        case greenTextField:
+            blueTextField.becomeFirstResponder()
+        default:
+            redTextField.becomeFirstResponder()
+        }
+        
+        return true
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
         if textField == redTextField {
             if let floatValue = Float(textField.text ?? ""), floatValue <= 1 {
                 sliderRed.value = Float(floatValue)
@@ -157,7 +162,6 @@ extension SettingsViewController: UITextFieldDelegate {
                 textField.text = sliderStringValue(with: sliderBlue)
             }
         }
-        return true
     }
 }
 
